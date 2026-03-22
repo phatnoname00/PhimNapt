@@ -4,20 +4,22 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
 
-  // Xóa console.log và debugger trong production build
   esbuild: {
     drop: ['console', 'debugger'],
   },
 
   build: {
-    // Tách bundle thành các chunk nhỏ để tải song song và cache dài hạn
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'player-vendor': ['react-player'],
-          'swiper-vendor': ['swiper'],
-          'axios': ['axios'],
+        // Vite 8 yêu cầu manualChunks là Function, không phải Object
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react-dom') || id.includes('react-router-dom')) return 'react-vendor';
+            if (id.includes('/react/')) return 'react-vendor';
+            if (id.includes('react-player') || id.includes('hls.js')) return 'player-vendor';
+            if (id.includes('swiper')) return 'swiper-vendor';
+            if (id.includes('axios')) return 'axios-vendor';
+          }
         }
       }
     },
@@ -30,4 +32,5 @@ export default defineConfig({
     include: ['react', 'react-dom', 'axios', 'react-router-dom'],
   }
 })
+
 
