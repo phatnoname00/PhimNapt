@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --color-darkBg: var(--bg-primary);
+  --color-darkCard: var(--bg-card);
+  --color-primary: #10b981;
+  --color-accent: #ef4444;
+}
+
+:root {
+  /* Light mode variables (default) */
+  --bg-primary: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --border-color: #cbd5e1;
+}
+
+.dark {
+  /* Dark mode variables */
+  --bg-primary: #0f172a;
+  --bg-card: #1e293b;
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --border-color: rgba(255, 255, 255, 0.05);
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    font-family: "Inter", "Outfit", "Segoe UI", Roboto, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary); 
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color); /* Tạm dùng màu border cho scroll thumb */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569; 
+}
+
+/* Glassmorphism helpers */
+.glass {
+  background: rgba(var(--bg-card), 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+}
