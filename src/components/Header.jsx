@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaSearch, FaBars, FaTimes, FaSun, FaMoon, FaUser, FaHeart, FaSignOutAlt } from 'react-icons/fa';
+import { FaSearch, FaBars, FaTimes, FaSun, FaMoon, FaUser, FaHeart, FaSignOutAlt, FaShieldAlt } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 
 const Header = () => {
@@ -52,9 +52,29 @@ const Header = () => {
         {/* Desktop Menu */}
         <nav className="hidden md:flex items-center space-x-6">
           <Link to="/" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition font-medium">Trang Chủ</Link>
-          <Link to="#" className="text-gray-600 dark:text-gray-300 hover:text-primary transition font-medium">Phim Lẻ</Link>
-          <Link to="#" className="text-gray-600 dark:text-gray-300 hover:text-primary transition font-medium">Phim Bộ</Link>
-          <Link to="#" className="text-gray-600 dark:text-gray-300 hover:text-primary transition font-medium">Chiếu Rạp</Link>
+          
+          {/* Genres Dropdown */}
+          <div className="relative group">
+            <button className="text-gray-600 dark:text-gray-300 hover:text-primary transition font-medium flex items-center gap-1 py-4">
+              Thể loại <span className="text-[10px] transform group-hover:rotate-180 transition-transform">▼</span>
+            </button>
+            <div className="absolute top-full left-0 w-64 bg-white dark:bg-darkCard rounded-xl shadow-2xl border border-gray-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all z-50 p-4 grid grid-cols-2 gap-2">
+              <Link to="/the-loai/hanh-dong" className="text-xs text-gray-600 dark:text-gray-400 hover:text-primary py-1 transition">Hành Động</Link>
+              <Link to="/the-loai/tinh-cam" className="text-xs text-gray-600 dark:text-gray-400 hover:text-primary py-1 transition">Tình Cảm</Link>
+              <Link to="/the-loai/hai-huoc" className="text-xs text-gray-600 dark:text-gray-400 hover:text-primary py-1 transition">Hài Hước</Link>
+              <Link to="/the-loai/co-trang" className="text-xs text-gray-600 dark:text-gray-400 hover:text-primary py-1 transition">Cổ Trang</Link>
+              <Link to="/the-loai/tam-ly" className="text-xs text-gray-600 dark:text-gray-400 hover:text-primary py-1 transition">Tâm Lý</Link>
+              <Link to="/the-loai/hinh-su" className="text-xs text-gray-600 dark:text-gray-400 hover:text-primary py-1 transition">Hình Sự</Link>
+              <Link to="/the-loai/vien-tuong" className="text-xs text-gray-600 dark:text-gray-400 hover:text-primary py-1 transition">Viễn Tưởng</Link>
+              <Link to="/the-loai/kinh-di" className="text-xs text-gray-600 dark:text-gray-400 hover:text-primary py-1 transition">Kinh Dị</Link>
+              <Link to="/the-loai/hoat-hinh" className="text-xs text-gray-600 dark:text-gray-400 hover:text-primary py-1 transition">Hoạt Hình</Link>
+              <Link to="/the-loai/vo-thuat" className="text-xs text-gray-600 dark:text-gray-400 hover:text-primary py-1 transition">Võ Thuật</Link>
+            </div>
+          </div>
+
+          <Link to="/danh-sach/phim-le" className="text-gray-600 dark:text-gray-300 hover:text-primary transition font-medium">Phim Lẻ</Link>
+          <Link to="/danh-sach/phim-bo" className="text-gray-600 dark:text-gray-300 hover:text-primary transition font-medium">Phim Bộ</Link>
+          <Link to="/danh-sach/hoat-hinh" className="text-gray-600 dark:text-gray-300 hover:text-primary transition font-medium">Anime</Link>
         </nav>
 
         {/* Auth / Mobile Toggle */}
@@ -95,7 +115,12 @@ const Header = () => {
                   <span className="text-sm font-bold text-gray-800 dark:text-white">{currentUser.username}</span>
                 </Link>
                 {/* Dropdown */}
-                <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-darkCard rounded-xl shadow-2xl border border-gray-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all z-50 overflow-hidden">
+                <div className="absolute top-full right-0 mt-2 w-52 bg-white dark:bg-darkCard rounded-xl shadow-2xl border border-gray-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all z-50 overflow-hidden">
+                  {currentUser.role === 'admin' && (
+                    <Link to="/admin" className="w-full text-left px-4 py-3 text-sm text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 flex items-center border-b border-gray-100 dark:border-slate-700/50 font-bold">
+                      <FaShieldAlt className="mr-2" /> 🛡️ Admin Panel
+                    </Link>
+                  )}
                   <Link to="/ho-so" className="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center border-b border-gray-100 dark:border-slate-700/50">
                     <FaUser className="mr-2 text-primary" /> Hồ Sơ Cá Nhân
                   </Link>
@@ -140,15 +165,16 @@ const Header = () => {
             </div>
           )}
           <Link to="/" className="text-gray-800 dark:text-gray-300 font-medium" onClick={() => setIsMenuOpen(false)}>Trang Chủ</Link>
+          <Link to="/danh-sach/phim-le" className="text-gray-800 dark:text-gray-300 font-medium" onClick={() => setIsMenuOpen(false)}>Phim Lẻ</Link>
+          <Link to="/danh-sach/phim-bo" className="text-gray-800 dark:text-gray-300 font-medium" onClick={() => setIsMenuOpen(false)}>Phim Bộ</Link>
+          <Link to="/danh-sach/hoat-hinh" className="text-gray-800 dark:text-gray-300 font-medium" onClick={() => setIsMenuOpen(false)}>Anime</Link>
+          
           {currentUser && (
             <>
               <Link to="/ho-so" className="text-gray-800 dark:text-gray-300 font-bold" onClick={() => setIsMenuOpen(false)}>👤 Hồ Sơ Cá Nhân</Link>
               <Link to="/yeu-thich" className="text-pink-500 font-bold" onClick={() => setIsMenuOpen(false)}>❤️ Phim Yêu Thích</Link>
             </>
           )}
-          <Link to="#" className="text-gray-800 dark:text-gray-300 font-medium">Phim Lẻ</Link>
-          <Link to="#" className="text-gray-800 dark:text-gray-300 font-medium">Phim Bộ</Link>
-          <Link to="#" className="text-gray-800 dark:text-gray-300 font-medium">Chiếu Rạp</Link>
           
           <form onSubmit={handleSearch} className="flex items-center bg-gray-200 dark:bg-darkBg rounded-full border border-gray-300 dark:border-slate-700 overflow-hidden px-3 py-2 mt-4">
             <input 

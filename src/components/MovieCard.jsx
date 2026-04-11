@@ -4,18 +4,36 @@ import { FaPlay } from 'react-icons/fa';
 
 const MovieCard = memo(({ movie, pathImage }) => {
   // Xử lý ảnh — hỗ trợ URL đầy đủ hoặc tương đối từ KKPhim
-  const imgUrl = movie.thumb_url?.startsWith('http') 
-    ? movie.thumb_url 
-    : `${pathImage || 'https://phimimg.com/'}${movie.thumb_url?.startsWith('/') ? movie.thumb_url.substring(1) : movie.thumb_url}`;
+  const imgUrl = (() => {
+    if (movie.thumb_url?.startsWith('http')) return movie.thumb_url;
+    if (movie.poster_url?.startsWith('http')) return movie.poster_url;
+    
+    const base = pathImage || 'https://phimimg.com/';
+    const path = movie.thumb_url || movie.poster_url || '';
+    
+    // Nếu path đã có /uploads/movies/ thì không thêm nữa
+    if (path.includes('uploads/movies/')) {
+      return `${base.split('/uploads/')[0]}/${path.startsWith('/') ? path.substring(1) : path}`;
+    }
+    
+    // Đảm bảo có /uploads/movies/ ở giữa nếu là path tương đối
+    const finalBase = base.endsWith('/') ? base : `${base}/`;
+    const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    
+    if (!finalBase.includes('uploads/movies')) {
+      return `${finalBase}uploads/movies/${cleanPath}`;
+    }
+    return `${finalBase}${cleanPath}`;
+  })();
 
   return (
-    <div className="group relative rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] bg-white dark:bg-darkCard border border-gray-200 dark:border-slate-800/50 block">
+    <div className="group relative rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] bg-white dark:bg-darkCard border border-gray-200 dark:border-slate-800/50 block">
       {/* Poster container */}
       <div className="aspect-[2/3] w-full relative">
         <img 
           src={imgUrl}
           alt={movie.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
           decoding="async"
           onError={(e) => { e.target.src = 'https://via.placeholder.com/200x300/1a1a2e/10b981?text=No+Image'; }}
@@ -36,12 +54,12 @@ const MovieCard = memo(({ movie, pathImage }) => {
         </div>
       </div>
 
-      {/* Info section */}
-      <div className="p-4 absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
-        <h3 className="text-white font-bold text-sm md:text-base truncate drop-shadow-md">
+      {/* Info section - Sized down */}
+      <div className="p-2 absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
+        <h3 className="text-white font-bold text-[10px] md:text-xs truncate drop-shadow-md">
           {movie.name}
         </h3>
-        <p className="text-gray-300 text-xs truncate mt-1 drop-shadow-md">
+        <p className="text-gray-300 text-[8px] md:text-[10px] truncate mt-0.5 drop-shadow-md opacity-80">
           {movie.origin_name}
         </p>
       </div>

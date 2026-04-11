@@ -12,9 +12,9 @@ const MeteorBackground = () => {
       <div className="absolute inset-0 preserve-3d perspective-1000">
         
         {/* Layer 1: Slow distant stars */}
-        <div className="absolute inset-0 animate-spin-slow opacity-30" style={{ transformStyle: 'preserve-3d' }}>
-           {Array.from({ length: 50 }).map((_, i) => (
-             <div key={`star1-${i}`} className="absolute w-1 h-1 bg-white rounded-full shadow-[0_0_5px_#fff]" 
+        <div className="absolute inset-0 animate-spin-slow opacity-20" style={{ transformStyle: 'preserve-3d' }}>
+           {Array.from({ length: 40 }).map((_, i) => (
+             <div key={`star1-${i}`} className="absolute w-1 h-1 bg-white rounded-full shadow-[0_0_3px_#fff]" 
                   style={{
                     top: `${Math.random() * 100}%`,
                     left: `${Math.random() * 100}%`,
@@ -26,9 +26,9 @@ const MeteorBackground = () => {
         </div>
 
         {/* Layer 2: Medium speed stars */}
-        <div className="absolute inset-0 animate-spin-slow-reverse opacity-50" style={{ transformStyle: 'preserve-3d' }}>
-           {Array.from({ length: 50 }).map((_, i) => (
-             <div key={`star2-${i}`} className="absolute w-1.5 h-1.5 bg-blue-200 rounded-full shadow-[0_0_8px_#93c5fd]" 
+        <div className="absolute inset-0 animate-spin-slow-reverse opacity-30" style={{ transformStyle: 'preserve-3d' }}>
+           {Array.from({ length: 40 }).map((_, i) => (
+             <div key={`star2-${i}`} className="absolute w-1 h-1 bg-blue-200 rounded-full shadow-[0_0_5px_#93c5fd]" 
                   style={{
                     top: `${Math.random() * 100}%`,
                     left: `${Math.random() * 100}%`,
@@ -41,27 +41,27 @@ const MeteorBackground = () => {
 
         {/* Meteor Shower Effect */}
         <div className="absolute inset-0 transform -rotate-45">
-          {Array.from({ length: 15 }).map((_, i) => (
+          {Array.from({ length: 10 }).map((_, i) => (
             <div 
               key={`meteor-${i}`}
-              className="absolute h-[2px] w-[100px] bg-gradient-to-r from-transparent via-white to-transparent animate-meteor opacity-0 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+              className="absolute h-[1.5px] w-[60px] bg-gradient-to-r from-transparent via-white to-transparent animate-meteor opacity-0 drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
               style={{
                 top: `${Math.random() * 100}%`,
                 left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 10}s`,
+                animationDelay: `${Math.random() * 15}s`,
                 animationDuration: `${Math.random() * 2 + 1}s`
               }}
             >
               {/* Meteor Head */}
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_15px_5px_#fff]"></div>
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-1 bg-white rounded-full shadow-[0_0_10px_3px_#fff]"></div>
             </div>
           ))}
         </div>
 
-        {/* Planet / Earth Element */}
-        <div className="absolute -bottom-20 -right-20 w-[300px] md:w-[600px] h-[300px] md:h-[600px] rounded-full bg-gradient-to-br from-blue-600 via-blue-900 to-black shadow-[inset_-20px_-20px_50px_rgba(0,0,0,0.8),0_0_100px_rgba(59,130,246,0.2)] animate-pulse-slow transition-opacity duration-1000 opacity-20 md:opacity-40">
+        {/* Planet / Earth Element - Sized down */}
+        <div className="absolute -bottom-20 -right-20 w-[200px] md:w-[400px] h-[200px] md:h-[400px] rounded-full bg-gradient-to-br from-blue-600 via-blue-900 to-black shadow-[inset_-15px_-15px_40px_rgba(0,0,0,0.8),0_0_80px_rgba(59,130,246,0.15)] animate-pulse-slow transition-opacity duration-1000 opacity-15 md:opacity-30">
            {/* Atmosphere glow */}
-           <div className="absolute inset-0 rounded-full border border-blue-400/20 blur-xl"></div>
+           <div className="absolute inset-0 rounded-full border border-blue-400/10 blur-xl"></div>
         </div>
       </div>
       

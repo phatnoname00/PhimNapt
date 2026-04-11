@@ -13,18 +13,23 @@ const WatchMovie = () => {
   const [currentEpisode, setCurrentEpisode] = useState(null);
   const [currentServer, setCurrentServer] = useState(0);
   const [playerType, setPlayerType] = useState('embed'); // 'embed' | 'm3u8'
-  const [langFilter, setLangFilter] = useState('all'); // 'all' | 'vietsub' | 'engsub' | 'thuyet-minh' | 'raw'
+  const [langFilter, setLangFilter] = useState('all');
+  const [source, setSource] = useState('kkphim'); // 'kkphim' | 'ophim'
+  const [hlsLevels, setHlsLevels] = useState([]);
+  const [currentLevel, setCurrentLevel] = useState(-1); // -1 = Auto
 
   const { addToHistory } = useWatchHistory();
+  const playerRef = useRef(null);
   const watchSectionRef = useRef(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
         setLoading(true);
-        const data = await api.getMovieDetails(slug);
+        const data = source === 'kkphim' 
+          ? await api.getMovieDetails(slug)
+          : await api.getMovieDetailsOphim(slug);
         
-        // KKPhim API: { status: true, movie: {...}, episodes: [...] }
         if (data && data.status === true && data.movie) {
           setMovieData(data);
           
@@ -57,7 +62,7 @@ const WatchMovie = () => {
       }
     };
     fetchDetails();
-  }, [slug]); // Chỉ refetch khi slug thay đổi, không theo searchParams
+  }, [slug, source]); // Refetch khi slug hoặc source thay đổi
 
   const handleEpisodeChange = (ep) => {
     setCurrentEpisode(ep);
@@ -114,10 +119,8 @@ const WatchMovie = () => {
         <div className="container mx-auto max-w-6xl aspect-video lg:py-6">
           <div className="w-full h-full bg-black rounded-lg overflow-hidden border border-slate-800 shadow-[0_0_30px_rgba(0,0,0,0.8)] relative">
             {playerType === 'embed' ? (
-              // KKPhim's link_embed is already a full player URL (player.phimapi.com)
-              // It can be embedded directly via iframe without CORS issues
               <iframe 
-                key={currentEpisode.slug}
+                key={currentEpisode.slug + source}
                 src={currentEpisode.link_embed} 
                 width="100%" 
                 height="100%" 
@@ -130,12 +133,20 @@ const WatchMovie = () => {
               ></iframe>
             ) : (
               <ReactPlayer 
-                key={currentEpisode.slug}
+                ref={playerRef}
+                key={currentEpisode.slug + source}
                 url={currentEpisode.link_m3u8}
                 width="100%"
                 height="100%"
                 controls={true}
                 playing={true}
+                onReady={(player) => {
+                  const hls = player.getInternalPlayer('hls');
+                  if (hls) {
+                    setHlsLevels(hls.levels || []);
+                    setCurrentLevel(hls.currentLevel);
+                  }
+                }}
                 config={{
                   file: {
                     forceHLS: true,
@@ -148,8 +159,71 @@ const WatchMovie = () => {
             )}
           </div>
           
-          {/* Language Filter + Player Type Switcher */}
-          <div className="mt-4 px-2 lg:px-0 space-y-3">
+          {/* Quality & Source & Player Type Controls */}
+          <div className="mt-4 px-2 lg:px-0 space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="text-xs text-gray-400 font-semibold uppercase tracking-widest">🚀 Nguồn:</span>
+                <button 
+                  onClick={() => setSource('kkphim')}
+                  className={`px-3 py-1 text-xs rounded-full font-bold transition-all ${source === 'kkphim' ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+                >
+                  Server #1 (KKPhim)
+                </button>
+                <button 
+                  onClick={() => setSource('ophim')}
+                  className={`px-3 py-1 text-xs rounded-full font-bold transition-all ${source === 'ophim' ? 'bg-orange-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+                >
+                  Server #2 (Ophim)
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setPlayerType('embed')}
+                  className={`px-3 py-1 text-xs rounded font-medium transition ${playerType === 'embed' ? 'bg-primary text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
+                >
+                  Dùng Iframe (Gốc)
+                </button>
+                <button 
+                  onClick={() => setPlayerType('m3u8')}
+                  className={`px-3 py-1 text-xs rounded font-medium transition ${playerType === 'm3u8' ? 'bg-primary text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
+                >
+                  Dùng M3U8 (Tùy chỉnh)
+                </button>
+              </div>
+            </div>
+
+            {/* Quality Selector (Only for M3U8) */}
+            {playerType === 'm3u8' && hlsLevels.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap bg-darkCard/50 p-2 rounded-lg border border-slate-800">
+                <span className="text-xs text-gray-400 font-semibold uppercase tracking-widest shrink-0">🎬 Chất lượng:</span>
+                <button
+                  onClick={() => {
+                    const hls = playerRef.current?.getInternalPlayer('hls');
+                    if (hls) hls.currentLevel = -1;
+                    setCurrentLevel(-1);
+                  }}
+                  className={`px-2 py-1 text-[10px] md:text-xs rounded font-bold transition-all ${currentLevel === -1 ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-gray-400'}`}
+                >
+                  Tự động
+                </button>
+                {hlsLevels.map((level, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      const hls = playerRef.current?.getInternalPlayer('hls');
+                      if (hls) hls.currentLevel = idx;
+                      setCurrentLevel(idx);
+                    }}
+                    className={`px-2 py-1 text-[10px] md:text-xs rounded font-bold transition-all ${currentLevel === idx ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-gray-400'}`}
+                  >
+                    {level.height}p
+                  </button>
+                ))}
+              </div>
+            )}
+
             {/* Language Subtitle Filter */}
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs text-gray-400 font-semibold uppercase tracking-widest shrink-0">🌐 Ngôn ngữ:</span>

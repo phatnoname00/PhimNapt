@@ -13,7 +13,12 @@ const Login = () => {
     e.preventDefault();
     const result = login(username, password);
     if (result.success) {
-      navigate('/');
+      // ✅ Admin redirect về /admin, user thường về trang chủ
+      if (result.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } else {
       setError(result.message);
     }
