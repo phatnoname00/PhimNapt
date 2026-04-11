@@ -141,9 +141,21 @@ const Home = () => {
           className="w-full h-full"
         >
           {featuredMovies.map((movie) => {
-            const bgUrl = movie.thumb_url?.startsWith('http')
-              ? movie.thumb_url
-              : `${pathImage}${movie.poster_url || movie.thumb_url}`;
+            const bgUrl = (() => {
+              if (movie.thumb_url?.startsWith('http')) return movie.thumb_url;
+              const base = pathImage || 'https://phimimg.com/';
+              const path = movie.thumb_url || movie.poster_url || '';
+              const finalBase = base.endsWith('/') ? base : `${base}/`;
+              const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+              if (cleanPath.startsWith('upload/') || cleanPath.includes('uploads/movies/')) {
+                const rootBase = finalBase.includes('/uploads/movies/') ? finalBase.split('/uploads/')[0] + '/' : finalBase;
+                return `${rootBase}${cleanPath}`;
+              }
+              if (!finalBase.includes('uploads/movies')) {
+                return `${finalBase}uploads/movies/${cleanPath}`;
+              }
+              return `${finalBase}${cleanPath}`;
+            })();
             return (
               <SwiperSlide key={movie.slug}>
                 <div className="relative w-full h-full">

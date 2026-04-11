@@ -11,15 +11,17 @@ const MovieCard = memo(({ movie, pathImage }) => {
     const base = pathImage || 'https://phimimg.com/';
     const path = movie.thumb_url || movie.poster_url || '';
     
-    // Nếu path đã có /uploads/movies/ thì không thêm nữa
-    if (path.includes('uploads/movies/')) {
-      return `${base.split('/uploads/')[0]}/${path.startsWith('/') ? path.substring(1) : path}`;
-    }
-    
-    // Đảm bảo có /uploads/movies/ ở giữa nếu là path tương đối
     const finalBase = base.endsWith('/') ? base : `${base}/`;
     const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+
+    // Nếu path đã bắt đầu bằng upload/ hoặc có uploads/movies/, nối trực tiếp với base
+    if (cleanPath.startsWith('upload/') || cleanPath.includes('uploads/movies/')) {
+      // Đảm bảo base không bị lặp uploads
+      const rootBase = finalBase.includes('/uploads/movies/') ? finalBase.split('/uploads/')[0] + '/' : finalBase;
+      return `${rootBase}${cleanPath}`;
+    }
     
+    // Nếu không, thêm uploads/movies/ (dành cho API cũ)
     if (!finalBase.includes('uploads/movies')) {
       return `${finalBase}uploads/movies/${cleanPath}`;
     }
